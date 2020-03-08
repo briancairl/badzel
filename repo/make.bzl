@@ -59,16 +59,17 @@ cc_library(
 )
 """
     build_path = str(ctx.path('.'))
-    print(build_path)
 
     # Build
     for cmd in commands:
-        ctx.execute(
+        cmd_exec_result = ctx.execute(
             [cmd] if type(cmd) == type("") else cmd,
             timeout=ctx.attr.build_timeout,
             quiet=False,
             working_directory=build_path
         )
+        if cmd_exec_result.return_code != 0:
+            fail(msg=cmd_exec_result.stderr, attr=str(cmd))
 
     deps_concat = ""
     for d in ctx.attr.deps :
@@ -92,8 +93,12 @@ cc_library(
 
     # Create build file
     bash_exe = ctx.os.environ["BAZEL_SH"] if "BAZEL_SH" in ctx.os.environ else "bash"
-    ctx.execute([bash_exe, "-c", "rm -f BUILD.bazel"])
-    ctx.file("BUILD.bazel", build_file_content)
+    build_file_cmd = [bash_exe, "-c", "rm -f BUILD.bazel"]
+    build_file_exec_result = ctx.execute(build_file_cmd)
+    if build_file_exec_result.return_code != 0:
+        fail(msg=build_file_exec_result.stderr, attr=' '.join(build_file_cmd))
+    else:
+        ctx.file("BUILD.bazel", build_file_content)
 
 
 def _make_this_new_http_archive_impl(ctx):

@@ -44,7 +44,6 @@ def _cmake_this_new_http_archive_impl(ctx):
 
     build_path = str(ctx.path('.'))
 
-
     # Build
     commands = [["cmake", build_path] + ctx.attr.cmake_options, "make"]
     make_cc_library(ctx=ctx, commands=commands)

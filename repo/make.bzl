@@ -25,8 +25,7 @@ SOFTWARE.
 make_this_new_http_archive_attrs={
     "url": attr.string(mandatory=True),
     "sha256": attr.string(mandatory=True),
-    "make_command": attr.string(default="make"),
-    "make_prefixes": attr.string_list(default=[]),
+    "make_commands": attr.string_list(default=["make"]),
     "strip_prefix": attr.string(mandatory=True),
     "deps": attr.string_list(default=[]),
     "copts": attr.string_list(default=[]),
@@ -113,7 +112,7 @@ def _make_this_new_http_archive_impl(ctx):
     )
 
     # Build
-    make_cc_library(ctx=ctx, commands=ctx.attr.make_prefixes + [ctx.attr.make_command])
+    make_cc_library(ctx=ctx, commands=ctx.attr.make_commands)
 
 
 make_this_new_http_archive = repository_rule(
